@@ -4,6 +4,14 @@
 # and is receiving the proper payload as well.
 from bell.avr.mqtt.client import MQTTModule
 from bell.avr.mqtt.payloads import AvrFcmVelocityPayload
+from bell.avr.mqtt.payloads import 
+(
+    AvrAutonomousEnablePayload,
+    AvrAutonomousBuildingDropPayload,
+    AvrApriltagsVisiblePayload,
+    AvrFcmLocationLocalPayload,
+)
+import time
 
 # This imports the third-party Loguru library which helps make logging way easier
 # and more useful.
@@ -34,6 +42,26 @@ class Sandbox(MQTTModule):
         # whenever a message arrives on that topic.
         self.topic_map = {"avr/fcm/velocity": self.show_velocity}
 
+        self.topic_map = {"avr/autonomous/enable": self.autonomous}
+        self.topic_map = {"avr/autonomous/building/drop": self}
+        self.topic_map = {"avr/apriltags/visible": self}
+        self.topic_map = {"avr/fcm/location/local": self}
+        self.visibleTag = None
+        self.drop1 = False
+        self.drop2 = False
+        self.drop3 = False
+        self.drop4 = False
+        self.drop5 = False
+        self.drop6 = False
+        self.drop7 = False
+        self.drop8 = False
+        self.dropZone = 10 # Horizontal altitude to prevent drop on accident
+        self.pickUpZone = 3 # Horizontal altitude to pick up water
+        
+
+
+
+
     # Here's an example of a custom message handler here.
     # This is what executes whenever a message is received on the "avr/fcm/velocity"
     # topic. The content of the message is passed to the `payload` argument.
@@ -52,6 +80,8 @@ class Sandbox(MQTTModule):
         # https://realpython.com/python-f-strings/#f-strings-a-new-and-improved-way-to-format-strings-in-python
         logger.debug(f"Velocity information: {v_ms} m/s")
 
+    
+
     # Here is an example on how to publish a message to an MQTT topic to
     # perform an action
     def open_servo(self) -> None:
@@ -64,6 +94,39 @@ class Sandbox(MQTTModule):
             "avr/pcm/set_servo_open_close",
             {"servo": 0, "action": "open"},
         )
+
+    def autonomous(self, payload:AvrAutonomousEnablePayload):
+        open = time + 1 # Time it takes to open water
+        close = time + 1 # Time it takes to close water
+        
+        did_message_received = payload ["enabled"]
+        
+        if self.tagNum == 1 and self.drop1 == False:
+            start = time.time ()
+            self.open_servo(0) and self.open_servo(1)
+            while time.time () > open:
+                pass
+            while time.time () > close:
+                pass
+            self.close_servo(0) and self.close_servo(1)
+            self.drop1 = True
+
+    def pickUp(self, payload:AvrFcmLocationLocalPayload):
+        heightDistance = payload["dY"]
+        height = heightDistance[0]["alt"]
+
+        if height < self.pickUpZone:
+            self.open_servo(2) and self.open_servo(3)
+
+
+    def visibleTag(self, payload:AvrAprilTagsVisiblePayload):
+        newTag = payload["tags"]
+        tagNum = newTag[0]["id"]
+        dropper = newTag[0]["horizontal_dist"]
+        if dropper < self.dropZone:
+            self.visibleTag = tagNum
+
+
 
 
 if __name__ == "__main__":
