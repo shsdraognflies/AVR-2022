@@ -52,9 +52,6 @@ class Sandbox(MQTTModule):
         self.drop3 = False
         self.drop4 = False
         self.drop5 = False
-        self.drop6 = False
-        self.drop7 = False
-        self.drop8 = False
         self.dropZone = 10 # Horizontal altitude to prevent drop on accident
         self.pickUpZone = 3 # Horizontal altitude to pick up water
         
@@ -96,28 +93,48 @@ class Sandbox(MQTTModule):
         )
 
     def autonomous(self, payload:AvrAutonomousEnablePayload):
+        start = time.time ()
         open = time + 1 # Time it takes to open water
         close = time + 1 # Time it takes to close water
+        
         
         did_message_received = payload ["enabled"]
         
         if self.tagNum == 1 and self.drop1 == False:
-            start = time.time ()
-            self.open_servo(0) and self.open_servo(1)
-            while time.time () > open:
-                pass
-            while time.time () > close:
-                pass
-            self.close_servo(0) and self.close_servo(1)
+            start
+            self.open_servo(1)
+            time.sleep(1)
+            self.close_servo(1)
             self.drop1 = True
-
-    def pickUp(self, payload:AvrFcmLocationLocalPayload):
-        heightDistance = payload["dY"]
-        height = heightDistance[0]["alt"]
-
-        if height < self.pickUpZone:
-            self.open_servo(2) and self.open_servo(3)
-
+            
+        if self.tagNum == 2 and self.drop2 == False:
+            start
+            self.open_servo(1)
+            time.sleep(1)
+            self.close_servo(1)
+            self.drop2 = True
+        
+        if self.tagNum == 3 and self.drop3 == False:
+            start
+            self.open_servo(1)
+            time.sleep(1)
+            self.close_servo(1)
+            self.drop3 = True
+       
+        if self.tagNum == 4 and self.drop4 == False:
+            start
+            self.open_servo(1)
+            time.sleep(1)
+            self.close_servo(1)
+            self.drop4 = True
+            
+       if self.tagNum == 5 and self.drop5 == False:
+            start
+            self.open_servo(1)
+            time.sleep(1)
+            self.close_servo(1)
+            self.drop5 = True
+    
 
     def visibleTag(self, payload:AvrAprilTagsVisiblePayload):
         newTag = payload["tags"]
