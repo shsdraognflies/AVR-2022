@@ -50,8 +50,8 @@ class Sandbox(MQTTModule):
         self.drop3 = False
         self.drop4 = False
         self.drop5 = False
-        self.dropZone = 10 # Horizontal altitude to prevent drop on accident
-        self.pickUpZone = 3 # Horizontal altitude to pick up water
+        self.dropZone = 15 # Horizontal altitude to prevent drop on accident
+        self.pickUpZone = 5 # Horizontal altitude to pick up water
         
 
 
