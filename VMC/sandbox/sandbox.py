@@ -4,13 +4,11 @@
 # and is receiving the proper payload as well.
 from bell.avr.mqtt.client import MQTTModule
 from bell.avr.mqtt.payloads import AvrFcmVelocityPayload
-from bell.avr.mqtt.payloads import 
-(
-    AvrAutonomousEnablePayload,
-    AvrAutonomousBuildingDropPayload,
-    AvrApriltagsVisiblePayload,
-    AvrFcmLocationLocalPayload,
-)
+from bell.avr.mqtt.payloads import AvrAutonomousEnablePayload
+from bell.avr.mqtt.payloads import AvrAutonomousBuildingDropPayload
+from bell.avr.mqtt.payloads import AvrApriltagsVisiblePayload
+from bell.avr.mqtt.payloads import AvrFcmLocationLocalPayload
+
 import time
 
 # This imports the third-party Loguru library which helps make logging way easier
@@ -44,7 +42,7 @@ class Sandbox(MQTTModule):
 
         self.topic_map = {"avr/autonomous/enable": self.autonomous}
         self.topic_map = {"avr/autonomous/building/drop": self}
-        self.topic_map = {"avr/apriltags/visible": self}
+        self.topic_map = {"avr/apriltags/visible": self.visibleTag}
         self.topic_map = {"avr/fcm/location/local": self}
         self.visibleTag = None
         self.drop1 = False
@@ -128,7 +126,7 @@ class Sandbox(MQTTModule):
             self.close_servo(1)
             self.drop4 = True
             
-       if self.tagNum == 5 and self.drop5 == False:
+        if self.tagNum == 5 and self.drop5 == False:
             start
             self.open_servo(1)
             time.sleep(1)
@@ -136,7 +134,7 @@ class Sandbox(MQTTModule):
             self.drop5 = True
     
 
-    def visibleTag(self, payload:AvrAprilTagsVisiblePayload):
+    def visibleTag(self, payload:AvrApriltagsVisiblePayload):
         newTag = payload["tags"]
         tagNum = newTag[0]["id"]
         dropper = newTag[0]["horizontal_dist"]
